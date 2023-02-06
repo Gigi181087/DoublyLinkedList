@@ -22,14 +22,14 @@ typedef struct dcList dcList_t;
 /// </summary>
 /// <param name="list">List to be initialized</param>
 /// <returns>0 if initialized successfully, otherwise use DCLGetLastError() to retreive Errorcode</returns>
-int DCLInit(dcList_t**);
+int DLL_Init(dcList_t**);
 
 /// <summary>
 /// Counts the elements contained in a list
 /// </summary>
 /// <param name=""></param>
 /// <returns></returns>
-int Count(dcList_t**, int*);
+int DLL_Count(dcList_t**, int*);
 int SetCursorToBegin(dcList_t**);
 int SetCursorToEnd(dcList_t**);
 int GetData(dcList_t*, void**);
