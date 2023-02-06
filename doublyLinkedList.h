@@ -2,19 +2,18 @@
 #define _DOUBLYLINKEDLIST_H
 
 // Errorcodes
-#define NOERROR                 0
-#define INDEXOUTOFRANGE         1
-#define LISTISEMPTY             2
-#define ALLOCATINGFAILED        3
-#define LISTNOTINITIALIZED      4
-#define LISTALREADYINITIALIZED  5
-#define UNSPECIFIED             INT_MAX
+#define DLLIST_NOERROR                 0
+#define DLLIST_INDEXOUTOFRANGE         1
+#define DLLIST_LISTISEMPTY             2
+#define DLLIST_ALLOCATINGFAILED        3
+#define DLLIST_LISTNOTINITIALIZED      4
+#define DLLIST_LISTALREADYINITIALIZED  5
+#define DLLIST_UNSPECIFIED             INT_MAX
 
 #include <stdio.h>
 #include <malloc.h>
 #include <Windows.h>
 
-typedef struct knot knot_t;
 typedef struct dlList dlList_t;
 
 // Konstruktor
@@ -67,6 +66,8 @@ int DLList_SetCursorToBegin(dlList_t*);
 /// <returns>0 if cursor was moved successfully, otherwise use DCLGetLastError() to retreive Errorcode</returns>
 int DLList_SetCursorToEnd(dlList_t*);
 
+int DLList_SetCursorToPosition(dlList_t*, int);
+
 
 int GetData(dcList_t*, void**);
 int DCL_GetDataFromIndex(dcList_t**, void*, int);
@@ -83,5 +84,9 @@ int DCL_GetLastError(void);
 /// <param errorcode="errorcode"></param>
 /// <returns>String representation of errorcode</returns>
 const char* DCLErrorToString(int errorCode);
+
+int DLList_Concat(dlList_t*, dlList_t*);
+
+int DLList_Split(dlList_t*, dlList_t*, int);
 
 #endif // _DOUBLYLINKEDLIST_H

@@ -6,15 +6,22 @@ struct knot {
     void** data;
 };
 
-struct dcList {
+struct dlList {
     knot_t* socket;
     knot_t* curr;
     int len;
 };
 
+typedef struct knot knot_t;
+
 static int lastError;
 
-int DCL_Init(dcList_t** list) {
+int DLList_Init(dcList_t** list) {
+    if ((*list)->curr != NULL) {
+        lastError = DLLIST_LISTALREADYINITIALIZED;
+        return -1;
+    }
+
     *list = (dcList_t*)malloc(sizeof(dcList_t));
     if (*list == NULL) {
         lastError = ALLOCATINGFAILED;
