@@ -46,13 +46,13 @@ int DLList_GetLength(dlList_t*);
 /// </summary>
 /// <param name="list">List on which the operations should be performed</param>
 /// <returns>0 if cursor was moved successfully, otherwise use DCLGetLastError() to retreive Errorcode</returns>
-int DLList_Prev(dlList_t*);
+int DLList_SetCursorToPrev(dlList_t*);
 /// <summary>
 /// Set the cursor to the next element of the list
 /// </summary>
 /// <param name="list">List on which the operations should be performed</param>
 /// <returns>0 if cursor was moved successfully, otherwise use DCLGetLastError() to retreive Errorcode</returns>
-int DLList_Next(dlList_t*);
+int DLList_SetCursorToNext(dlList_t*);
 /// <summary>
 /// Set the cursor to the first element of the list
 /// </summary>
@@ -65,10 +65,16 @@ int DLList_SetCursorToBegin(dlList_t*);
 /// <param name="list">List on which the operations should be performed</param>
 /// <returns>0 if cursor was moved successfully, otherwise use DCLGetLastError() to retreive Errorcode</returns>
 int DLList_SetCursorToEnd(dlList_t*);
-
+/// <summary>
+/// Set the cursor to the given Index of the list
+/// </summary>
+/// <param name="list">List on which the operations should be performed</param>
+/// <param name="index">Index to which the cursor should be set</param>
+/// <returns>0 if cursor was moved successfully, otherwise use DCLGetLastError() to retreive Errorcode</returns>
 int DLList_SetCursorToPosition(dlList_t*, int);
 
 
+904791
 int GetData(dcList_t*, void**);
 int DCL_GetDataFromIndex(dcList_t**, void*, int);
 int DCL_InsertBefore(dcList_t*, void**);

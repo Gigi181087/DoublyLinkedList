@@ -16,7 +16,7 @@ typedef struct knot knot_t;
 
 static int lastError;
 
-int DLList_Init(dcList_t** list) {
+int DLList_Init(dlList_t** list) {
     if ((*list)->curr != NULL) {
         lastError = DLLIST_LISTALREADYINITIALIZED;
         return -1;
@@ -45,16 +45,17 @@ int DLList_Init(dcList_t** list) {
     return 0;
 }
 
-int DCL_Destroy(dcList_t** list) {
+int DLList_Destroy(dcList_t** list) {
     SetCursorToBegin(*list);
-    while (DCL_Next(*list) != -1) {
-        DCL_Remove(*list);
+    while (DLList_Next(*list) != -1) {
+        DLList_Remove(*list);
     }
     free(*list);
+
     return 0;
 }
 
-int DCL_Next(dcList_t* list) {
+int DLList_SetCursorToNext(dlList_t* list) {
     if (!DCL_IsInitialized) {
         lastError = LISTNOTINITIALIZED;
         return -1;
@@ -64,10 +65,11 @@ int DCL_Next(dcList_t* list) {
         return -1;
     }
     list->curr = list->curr->next;
+
     return 0;           
 }
 
-int DCL_Prev(dcList_t* list) {
+int DLList_SetCursorToPrev(dlList_t* list) {
     if (!DCL_IsInitialized) {
         lastError = LISTNOTINITIALIZED;
         return -1;
@@ -99,7 +101,7 @@ int DCL_Count(dcList_t* list) {
     }
 }
 
-int SetCursorToBegin(dcList_t* list) {
+int SetCursorToBegin(dlList_t* list) {
     if (DCLIsInitializedAndNotEmpty(list)) {
         return -1;
     }
@@ -108,7 +110,7 @@ int SetCursorToBegin(dcList_t* list) {
     return 0;
 }
 
-int SetCursorToEnd(dcList_t* list) {
+int DLList_SetCursorToEnd(dlList_t* list) {
     if (!DCLIsInitializedAndNotEmpty(list)) {
         return -1;
     }
@@ -117,7 +119,7 @@ int SetCursorToEnd(dcList_t* list) {
     return 0;
 }
 
-int SetCursorToIndex(dcList_t* list, int index) {
+int DLLSetCursorToIndex(dlList_t* list, int index) {
     if (!DCLIsInitializedAndNotEmpty(list)) {
         return -1;
     }
@@ -149,7 +151,7 @@ int SetCursorToIndex(dcList_t* list, int index) {
     return 0;
 }
 
-int GetData(dcList_t* list, void** data) {
+int GetData(dlList_t* list, void** data) {
     if (!DCLIsInitialized(list)) {
         return -1;
     }
@@ -158,7 +160,7 @@ int GetData(dcList_t* list, void** data) {
     return 0;
 }
 
-int GetDataFromIndex(dcList_t** list, void* data, int index) {
+int GetDataFromIndex(dlList_t** list, void* data, int index) {
     knot_t* buff = (*list)->curr;
     if (!SetCursorToIndex(list, index)) {
         return -1;
@@ -169,7 +171,7 @@ int GetDataFromIndex(dcList_t** list, void* data, int index) {
     return 0;
 }
 
-int InsertAfter(dcList_t* list, void** data) {
+int DLList_InsertAfter(dlList_t* list, void** data) {
     if (!DCLIsInitialized(list)) {
         lastError = LISTNOTINITIALIZED;
         return -1;
@@ -189,19 +191,30 @@ int InsertAfter(dcList_t* list, void** data) {
     return 0;
 }
 
-int InsertBefore(dcList_t** list, void* data) {
+int InsertBefore(dlList_t** list, void* data) {
 
     return 0;
 }
 
-int DCL_GetLastError(void) {
+int DLList_GetLength(dlList_t* list) {
+    if (DCLIsInitialized(list)) {
+        return list->len;
+    }
+    else {
+        lastError = LISTNOTINITIALIZED;
+        return -1;
+    }
+}
+
+// Error handling
+int DLList_GetLastError(void) {
     int output = lastError;
     lastError = 0;
 
     return output;
 }
 
-const char* DCL_ErrorToString(int errorcode) {
+const char* DLList_ErrorToString(int errorcode) {
     switch (errorcode) {
     case NOERROR:
         return ("No error! (%d)" , errorcode);
@@ -211,18 +224,12 @@ const char* DCL_ErrorToString(int errorcode) {
         return "List is empty! (2)";
     case 3: 
         return "Allocating failed! (3)";
-    case SEM_WAIT_ABANDONED:
-        return "The specified object is a mutex object that was not released by the thread that owned the mutex object before the owning thread terminated. Ownership of the mutex object is granted to the calling thread and the mutex state is set to nonsignaled. If the mutex was protecting persistent state information, you should check it for consistency. (20)";
-    case WAIT_TIMEOUT:
-        return "The time-out interval elapsed, and the object's state is nonsignaled. (22)";
-    case SEM_WAIT_FAILED:
-        return "The function has failed. To get extended error information, call GetLastError. (23)";
     default:
         return ("Unknown error! (%d)", errorcode);
     }
 }
-
-int DCLIsNotEmpty(dcList_t** list) {
+//  For internal use only
+int DLList_IsNotEmpty(dcList_t* list) {
     if ((*list)->socket->next == (*list)->socket) {
         return 0;
     } else {
@@ -230,7 +237,7 @@ int DCLIsNotEmpty(dcList_t** list) {
     }
 }
 
-int DCLIsInitialized(dcList_t** list) {
+int DLList_IsInitialized(dcList_t* list) {
     if ((*list)->curr == NULL) {
         return 0;
     }
@@ -239,7 +246,7 @@ int DCLIsInitialized(dcList_t** list) {
     }
 }
 
-int DCLIsInitializedAndNotEmpty(dcList_t** list) {
+int DLList_IsInitializedAndNotEmpty(dcList_t* list) {
     if (!DCLIsInitialized(list)) {
         lastError = LISTNOTINITIALIZED;
         return -1;
@@ -251,7 +258,7 @@ int DCLIsInitializedAndNotEmpty(dcList_t** list) {
 
     return 0;
 }
-
+ /*
 void DCL_SetSemError(DWORD error) {
     switch (error) {
     case WAIT_ABANDONED:
@@ -268,14 +275,4 @@ void DCL_SetSemError(DWORD error) {
     }
 
     return;
-}
-
-DCL_GetLength(dcList_t* list) {
-    if (DCLIsInitialized(list)) {
-        return list->len;
-    }
-    else {
-        lastError = LISTNOTINITIALIZED;
-        return -1;
-    }
-}
+}*/
