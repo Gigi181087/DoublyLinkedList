@@ -42,3 +42,26 @@ void DLList_Internal_SwitchNodes(node_t* node1, node_t* node2) {
 
     return;
 }
+
+node_t* DLList_GetNodeFromIndex(dlList_t* list, int index) {
+    node_t* output = list->socket->next;
+    for (int i = 0; i < index; i++) {
+        output = output->next;
+    }
+
+    return output;
+}
+
+void DLList_Intern_InsertBefore(node_t* node1, node_t* node2) {
+    // Cut first node out of list
+    node1->next->prev = node1->prev;
+    node1->prev->next = node1->next;
+
+    // Insert node in front of node2
+    node1->prev = node2->prev;
+    node1->next = node2;
+    node2->prev->next = node1;
+    node2->prev = node1
+
+    return;
+}
