@@ -10,5 +10,10 @@ void DLList_MoveBefore(knot_t* knot) {
 }
 
 void DLList_MoveAfter(knot_t* knot) {
+    knot->next->prev = knot->prev;
+    knot->prev = knot->next;
+    knot->next = knot->prev->next;
+    knot->prev->next = knot;
+
     return;
 }
