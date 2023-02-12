@@ -16,7 +16,8 @@ typedef struct knot knot_t;
 
 static int lastError;
 
-int DLList_Init(dlList_t** list) {
+// Konstruktor
+int DLList_Init(dlList_t** list)      {
     if ((*list)->curr != NULL) {
         lastError = DLLIST_LISTALREADYINITIALIZED;
         return -1;
@@ -45,6 +46,7 @@ int DLList_Init(dlList_t** list) {
     return 0;
 }
 
+// Destruktor
 int DLList_Destroy(dcList_t** list) {
     SetCursorToBegin(*list);
     while (DLList_Next(*list) != -1) {
@@ -55,6 +57,7 @@ int DLList_Destroy(dcList_t** list) {
     return 0;
 }
 
+// Cursor Operations to move through the list
 int DLList_SetCursorToNext(dlList_t* list) {
     if (!DCL_IsInitialized) {
         lastError = LISTNOTINITIALIZED;
@@ -82,26 +85,7 @@ int DLList_SetCursorToPrev(dlList_t* list) {
     return 0;
 }
 
-// not needed?
-int DCL_Count(dcList_t* list) {
-    if ((*list)->curr == NULL) {
-        lastError = LISTNOTINITIALIZED;
-
-        return -1;
-    } 
-    else {
-        knot_t* buff = (*list)->socket;
-        int counter = 0;
-        while (buff->next != (*list)->socket) {
-            buff = buff->next;
-            counter++;
-        }
-
-        return counter;
-    }
-}
-
-int SetCursorToBegin(dlList_t* list) {
+int DLList_SetCursorToFirst(dlList_t* list) {
     if (DCLIsInitializedAndNotEmpty(list)) {
         return -1;
     }
@@ -110,16 +94,16 @@ int SetCursorToBegin(dlList_t* list) {
     return 0;
 }
 
-int DLList_SetCursorToEnd(dlList_t* list) {
+int DLList_SetCursorToLast(dlList_t* list) {
     if (!DCLIsInitializedAndNotEmpty(list)) {
         return -1;
     }
-    list->curr = list->socket->prev;
+    SetCursorToLast(list);
 
     return 0;
 }
 
-int DLLSetCursorToIndex(dlList_t* list, int index) {
+int DLList_SetCursorToIndex(dlList_t* list, int index) {
     if (!DCLIsInitializedAndNotEmpty(list)) {
         return -1;
     }
@@ -171,30 +155,44 @@ int GetDataFromIndex(dlList_t** list, void* data, int index) {
     return 0;
 }
 
+// Insert data into list
+int DLList_Add(dlList_t* list, void** data) {
+    if (!DCLIsInitializedAndNotEmpty(list)) {
+        return -1;
+    }
+    return DLList_Internal_InsertAfter(list->socket->prev, data);
+
+}
+
 int DLList_InsertAfter(dlList_t* list, void** data) {
     if (!DCLIsInitialized(list)) {
         lastError = LISTNOTINITIALIZED;
         return -1;
     }
-    knot_t* newKnot = (knot_t*)malloc(sizeof(knot_t));
+    return DLList_Internal_InsertAfter(list->curr, data);
+    /*knot_t* newKnot = (knot_t*)malloc(sizeof(knot_t));
     if (newKnot == NULL) {
         lastError = ALLOCATINGFAILED;
         return -1;
     }
-    newKnot->data = (*data);
+    newKnot->data = *data;
     newKnot->prev = list->curr;
     newKnot->next = list->curr->next;
     list->curr->next->prev = newKnot;
     list->curr->next = newKnot;
     list->curr = newKnot;
 
-    return 0;
+    return 0;*/
 }
 
-int InsertBefore(dlList_t** list, void* data) {
-
-    return 0;
+int InsertBefore(dlList_t* list, void** data) {
+    if (!DCLIsInitialized(list)) {
+        lastError = LISTNOTINITIALIZED;
+        return -1;
+    }
+    return DLList_Internal_InsertAfter(list->curr->prev, data);
 }
+
 
 int DLList_GetLength(dlList_t* list) {
     if (DCLIsInitialized(list)) {
@@ -228,6 +226,8 @@ const char* DLList_ErrorToString(int errorcode) {
         return ("Unknown error! (%d)", errorcode);
     }
 }
+
+
 //  For internal use only
 int DLList_IsNotEmpty(dcList_t* list) {
     if ((*list)->socket->next == (*list)->socket) {
@@ -276,3 +276,51 @@ void DCL_SetSemError(DWORD error) {
 
     return;
 }*/
+
+// not needed?
+int DCL_Count(dcList_t* list) {
+    if ((*list)->curr == NULL) {
+        lastError = LISTNOTINITIALIZED;
+
+        return -1;
+    }
+    else {
+        knot_t* buff = (*list)->socket;
+        int counter = 0;
+        while (buff->next != (*list)->socket) {
+            buff = buff->next;
+            counter++;
+        }
+
+        return counter;
+    }
+}
+
+void SetCursorToLast(dlList_t* list) {
+    list->curr = list->socket->prev;
+
+    return;
+}
+
+void DLList_Internal_SetCursorToNext(dlList_t* list) {
+    list->curr = list->curr->next;
+
+    return;
+}
+
+int DLList_Internal_InsertAfter(knot_t* knot, void** data) {
+    knot_t* newKnot = (knot_t*)malloc(sizeof(knot_t);
+    if (newKnot == NULL) {
+        lastError = DLLIST_ALLOCATINGFAILED;
+        return -1;
+    }
+
+    newKnot->data = *data;
+    newKnot->next = knot->next;
+    newKnot->prev = knot;
+
+    knot->next = newKnot;
+
+    return 0;
+}
+
