@@ -1,6 +1,7 @@
-#include "doubleChainedList.h"
+#include "doublyLinkedList.h"
+#include "doublyLinkedList_Int.h"
 
-struct knot {
+struct node {
     knot_t* prev;
     knot_t* next;
     void** data;
@@ -12,7 +13,6 @@ struct dlList {
     int len;
 };
 
-typedef struct knot knot_t;
 
 static int lastError;
 
@@ -47,12 +47,33 @@ int DLList_Init(dlList_t** list)      {
 }
 
 // Destruktor
-int DLList_Destroy(dcList_t** list) {
-    SetCursorToBegin(*list);
-    while (DLList_Next(*list) != -1) {
-        DLList_Remove(*list);
+void DLList_Destroy(dlList_t** list) {
+    ASSERT_INITIALIZED(*list);
+
+    while ((*list)->socket->next != (*list)->socket) {
+        DLList_Internal_DestroyNode(DLList_Internal_RemoveNode((*list)->socket->next));
     }
+    DLList_Internal_DestroyNode((*list)->socket);
     free(*list);
+
+    return;
+}
+
+int DLList_Remove(dlList* list) {
+    ASSERT_INITIALIZEDANDNOTEMPTY(list);
+
+    node_t* buff;
+    if (list->next != list->socket) {
+        buff = list->curr->next;
+    }
+    else if(list->prev != list->socket) {
+        buff = list->curr->prev;
+    }
+    else {
+        buff = NULL;
+    }
+    DLList_Internal_DestroyNode(DLList_Internal_RemoveNode(list->curr));
+    list->curr = buff;
 
     return 0;
 }
@@ -256,7 +277,7 @@ int DLList_IsInitializedAndNotEmpty(dcList_t* list) {
         return -1;
     }
 
-    return 0;
+    return 1;
 }
  /*
 void DCL_SetSemError(DWORD error) {
@@ -322,5 +343,22 @@ int DLList_Internal_InsertAfter(knot_t* knot, void** data) {
     knot->next = newKnot;
 
     return 0;
+}
+
+node_t* DLList_Internal_RemoveNode(node_t* node) {
+    node->next->prev = node->prev;
+    node->prev->next = node->next;
+
+    node->next = NULL;
+    node->prev = NULL;
+
+    return node;
+}
+
+void DLList_Internal_DestroyNode(node_t* node) {
+    free(node->(* data));
+    free(node);
+
+    return;
 }
 
